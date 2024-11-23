@@ -22,7 +22,7 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final JwtTokenBlacklistService jwtTokenBlacklistService;
+    private final BlacklistService blacklistService;
 
 
     @Override
@@ -34,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = getJwtFromRequest(request);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            if (!jwtTokenBlacklistService.isTokenBlacklisted(token)) { //blacklist check
+            if (!blacklistService.isTokenBlacklisted(token)) { //blacklist check
                 Long userId = jwtTokenProvider.getUserIdFromToken(token);
                 String username = jwtTokenProvider.getUsernameFromToken(token);
                 CustomUserDetails userDetails = new CustomUserDetails(
@@ -44,18 +44,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         List.of(new SimpleGrantedAuthority("USER"))
                 );
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                       userDetails, null, userDetails.getAuthorities()
+                        userDetails, null, userDetails.getAuthorities()
                 );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } else {
                 log.warn("Token is blacklisted: {}", token);
             }
         }
+        //todo remove
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
             log.info("Principal in SecurityContext: {}", auth.getPrincipal());
         }
-
         filterChain.doFilter(request, response);
     }
 

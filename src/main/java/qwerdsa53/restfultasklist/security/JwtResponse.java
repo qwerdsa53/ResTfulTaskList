@@ -1,4 +1,4 @@
-package qwerdsa53.restfultasklist.dto;
+package qwerdsa53.restfultasklist.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
