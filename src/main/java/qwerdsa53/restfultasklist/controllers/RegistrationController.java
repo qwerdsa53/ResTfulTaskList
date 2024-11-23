@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import qwerdsa53.restfultasklist.dto.UserRegistrationDto;
-import qwerdsa53.restfultasklist.services.UserService;
+import qwerdsa53.restfultasklist.user.UserRegistrationDto;
+import qwerdsa53.restfultasklist.user.UserService;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @AllArgsConstructor
 public class RegistrationController {
     private final UserService userService;

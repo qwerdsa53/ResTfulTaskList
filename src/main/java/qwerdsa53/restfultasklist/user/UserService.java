@@ -1,11 +1,8 @@
-package qwerdsa53.restfultasklist.services;
+package qwerdsa53.restfultasklist.user;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import qwerdsa53.restfultasklist.dto.UserRegistrationDto;
-import qwerdsa53.restfultasklist.entity.User;
-import qwerdsa53.restfultasklist.repo.UserRepo;
 
 @Service
 @AllArgsConstructor

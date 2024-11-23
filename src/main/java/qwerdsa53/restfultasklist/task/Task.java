@@ -1,14 +1,25 @@
-package qwerdsa53.restfultasklist.entity;
+package qwerdsa53.restfultasklist.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import qwerdsa53.restfultasklist.user.User;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Table(name = "tasks")
+@Table(
+        name = "tasks",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {
+                                "user_id",
+                                "title"
+                        }
+                )
+        }
+)
 public class Task {
 
     @Id
@@ -21,7 +32,6 @@ public class Task {
     @Column
     private String description;
 
-    @Column(nullable = false)
     private boolean completed = false;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -9,20 +9,20 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import qwerdsa53.restfultasklist.security.BlacklistService;
+import qwerdsa53.restfultasklist.security.JwtResponse;
 import qwerdsa53.restfultasklist.security.JwtTokenProvider;
-import qwerdsa53.restfultasklist.dto.JwtResponse;
-import qwerdsa53.restfultasklist.dto.LoginRequest;
-import qwerdsa53.restfultasklist.security.JwtTokenBlacklistService;
+import qwerdsa53.restfultasklist.user.LoginRequest;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @Slf4j
 @AllArgsConstructor
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-    private final JwtTokenBlacklistService jwtTokenBlacklistService;
+    private final BlacklistService blacklistService;
 
 
     @PostMapping("/login")
@@ -39,7 +39,7 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String token = jwtTokenProvider.generateToken(authentication);
 
-            return ResponseEntity.ok(new JwtResponse(token));
+            return ResponseEntity.status(HttpStatus.OK).body(new JwtResponse(token));
         } catch (Exception e) {
             log.error("Authentication failed: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
@@ -48,13 +48,20 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String authorizationHeader) {
-        // get token from header and add it to a blacklist
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
-            jwtTokenBlacklistService.addTokenToBlacklist(token);
-            return ResponseEntity.ok("Logged out successfully");
+
+            long remainingTime = jwtTokenProvider.getRemainingTimeFromToken(token);
+
+            if (remainingTime > 0) {
+                blacklistService.addToBlacklist(token, remainingTime);
+                return ResponseEntity.status(HttpStatus.OK).body("Logged out successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token has already expired");
+            }
         } else {
-            return ResponseEntity.badRequest().body("Invalid token");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token");
         }
     }
+
 }

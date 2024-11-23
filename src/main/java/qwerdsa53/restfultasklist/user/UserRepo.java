@@ -1,8 +1,7 @@
-package qwerdsa53.restfultasklist.repo;
+package qwerdsa53.restfultasklist.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import qwerdsa53.restfultasklist.entity.User;
 
 import java.util.Optional;
 

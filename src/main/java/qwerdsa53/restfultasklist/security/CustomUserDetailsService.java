@@ -7,8 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import qwerdsa53.restfultasklist.entity.User;
-import qwerdsa53.restfultasklist.repo.UserRepo;
+import qwerdsa53.restfultasklist.user.User;
+import qwerdsa53.restfultasklist.user.UserRepo;
 
 import java.util.List;
 
