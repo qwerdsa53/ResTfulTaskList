@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -37,11 +39,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (!blacklistService.isTokenBlacklisted(token)) { //blacklist check
                 Long userId = jwtTokenProvider.getUserIdFromToken(token);
                 String username = jwtTokenProvider.getUsernameFromToken(token);
+                List<String> roles = jwtTokenProvider.getRolesFromToken(token);
+                List<GrantedAuthority> authorities = roles.stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+
                 CustomUserDetails userDetails = new CustomUserDetails(
                         userId,
                         username,
                         null,
-                        List.of(new SimpleGrantedAuthority("USER"))
+                        authorities
                 );
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities()
@@ -51,7 +58,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.warn("Token is blacklisted: {}", token);
             }
         }
-        //todo remove
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
             log.info("Principal in SecurityContext: {}", auth.getPrincipal());

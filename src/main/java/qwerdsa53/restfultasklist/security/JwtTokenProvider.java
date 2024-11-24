@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -29,9 +31,13 @@ public class JwtTokenProvider {
 
     public String generateToken(Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(authority -> "ROLE_" + authority.getAuthority())
+                .collect(Collectors.toList());
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("userId", userDetails.getId())
+                .claim("roles", userDetails.getAuthorities())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
@@ -62,6 +68,23 @@ public class JwtTokenProvider {
         Date expiration = getExpirationFromToken(token);
         long currentTimeMillis = System.currentTimeMillis();
         return expiration.getTime() - currentTimeMillis;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> getRolesFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+
+        Object roles = claims.get("roles");
+        if (roles instanceof List<?>) {
+            return ((List<?>) roles).stream()
+                    .filter(role -> role instanceof String)
+                    .map(String.class::cast)
+                    .collect(Collectors.toList());
+        }
+        throw new IllegalArgumentException("Invalid roles format in token");
     }
 
     public boolean validateToken(String token) {

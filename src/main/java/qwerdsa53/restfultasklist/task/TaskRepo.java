@@ -26,4 +26,12 @@ public interface TaskRepo extends JpaRepository<Task, Long> {
             @Param("updatedAt") LocalDateTime updatedAt
     );
 
+
+    @Modifying
+    @Query("DELETE FROM Task t WHERE t.id = :taskId AND t.user.id = :userId")
+    int deleteByIdAndUserId(
+            @Param("taskId") Long taskId,
+            @Param("userId") Long userId
+    );
+
 }

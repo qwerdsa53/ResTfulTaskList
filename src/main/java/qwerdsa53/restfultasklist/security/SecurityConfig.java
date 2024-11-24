@@ -17,8 +17,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll() // open endpoints
-                        .requestMatchers("/api/auth/logout, /api/tasks").authenticated() // need authentication
+                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register").permitAll() // open endpoints
+                        .requestMatchers("/users/**", "/tasks/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

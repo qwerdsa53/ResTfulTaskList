@@ -1,6 +1,7 @@
 package qwerdsa53.restfultasklist.controllers;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,6 +18,7 @@ import java.util.NoSuchElementException;
 @RestController
 @RequestMapping("api/v1/tasks")
 @AllArgsConstructor
+@Slf4j
 public class TaskController {
     private final TaskService taskService;
     private final UserRepo userRepo;

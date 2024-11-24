@@ -52,16 +52,13 @@ public class TaskService {
         }
     }
 
+    @Transactional
     public void deleteTask(Long taskId, Long userId) {
-        Task task = new Task();
-        task.setId(taskId);
-
-        User user = new User();
-        user.setId(userId);
-        task.setUser(user);
-
-        taskRepo.delete(task);
+        log.info("User {} attempted to delete task {}", userId, taskId);
+        int deleted = taskRepo.deleteByIdAndUserId(taskId, userId);
+        if (deleted == 0) {
+            throw new NoSuchElementException("Task not found or access denied.");
+        }
     }
-
 
 }
